@@ -48,7 +48,7 @@
             </div>
         </div>
         <div class="py-8 card-body">
-            <form action="" class="space-y-4">
+            <form class="space-y-4">
                 <div class="form-group">
                     <label for="">Email</label>
                     <input
@@ -82,6 +82,7 @@ const callback = (response: any) => {
     // This callback will be triggered when the user selects or login to
     // his Google account from the popup
     console.log("Handle the response", response);
+    useSocialLogin();
 };
 
 import {

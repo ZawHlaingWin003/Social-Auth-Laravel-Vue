@@ -1,22 +1,35 @@
 import "./assets/css/style.css";
 
-import { createApp } from "vue";
+import { createApp, markRaw } from "vue";
 import { createPinia } from "pinia";
 
 import App from "./App.vue";
 import router from "./router";
-import axios, { type AxiosInstance } from "axios";
+import type { Router } from "vue-router";
+
+const pinia = createPinia();
+declare module "pinia" {
+    export interface PiniaCustomProperties {
+        router: Router;
+    }
+}
+pinia.use(({ store }) => {
+    store.router = markRaw(router);
+});
 
 const app = createApp(App);
-app.use(createPinia());
+app.use(pinia);
 app.use(router);
 
+// Vue3GoogleLogin
 import vue3GoogleLogin from "vue3-google-login";
 app.use(vue3GoogleLogin, {
     clientId:
         "611464660510-qog69eser9a31fvqnq1b7e65dq895dpu.apps.googleusercontent.com",
 });
 
+// UniversalSocialAuth
+import axios, { type AxiosInstance } from "axios";
 import UniversalSocialauth from "universal-social-auth";
 declare module "@vue/runtime-core" {
     interface ComponentCustomProperties {
@@ -28,19 +41,23 @@ const options = {
     providers: {
         github: {
             clientId: "**************",
-            redirectUri: "https://myapp.com/auth/github/callback",
+            redirectUri: `${import.meta.env.BASE_URL}/auth/github/callback`,
         },
         google: {
             clientId: "***************",
-            redirectUri: "https://myapp.com/auth/google/callback",
+            redirectUri: `${import.meta.env.BASE_URL}/auth/google/callback`,
         },
         facebook: {
             clientId: "************",
-            redirectUri: "https://myapp.com/auth/facebook/callback",
+            redirectUri: `${import.meta.env.BASE_URL}/auth/facebook/callback`,
         },
     },
 };
-const Oauth: UniversalSocialauth = new UniversalSocialauth(axios, options);
+const axiosInstance: any = axios;
+const Oauth: UniversalSocialauth = new UniversalSocialauth(
+    axiosInstance,
+    options
+);
 app.config.globalProperties.$Oauth = Oauth;
 app.config.globalProperties.$axios = axios;
 
